@@ -1,8 +1,8 @@
 package main
 
 import (
-	handlers "ginessnital/controller"
 	"ginessnital/global"
+	"ginessnital/router"
 	"ginessnital/utils/db"
 	"github.com/gin-gonic/gin"
 )
@@ -10,10 +10,6 @@ import (
 func main() {
 	r := gin.Default()
 	global.Mysql = db.InitDB()
-	userv1_h := handlers.UserV1{}
-	userv1 := r.Group("/user/v1")
-	{
-		userv1.GET("/check", userv1_h.CheckUsers)
-	}
+	r = router.CollectRoutes(r)
 	r.Run(":8080")
 }
