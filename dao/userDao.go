@@ -13,7 +13,7 @@ func RegisterUser(username string, password string, age int) error {
 	//查询单条数据
 	row := global.Mysql.QueryRow("select * from sys_user where username =?", username)
 	log.Println(row, "row")
-	var u model.RegisterUser
+	var u model.User
 	err := row.Scan(&u.Username, &u.Password, &u.Age)
 	log.Println(err, "err")
 	//sql: expected 4 destination arguments in Scan, not 3 err
@@ -38,45 +38,32 @@ func RegisterUser(username string, password string, age int) error {
 }
 
 // 登录
-func LoginUser(username string, password string) (err error, reg model.RegisterUser) {
-	rows, err := global.Mysql.Query("select username,password from sys_user where username =?", username)
+func LoginUser(username string) (user *model.User) {
+	var u model.User
+	row := global.Mysql.QueryRow("select * from sys_user where username = ?", username)
+	err := row.Scan(&u.ID, &u.Username, &u.Password, &u.Age)
 	if err != nil {
-		fmt.Println("查询失败")
-		return err, reg
+		fmt.Println(&u, "err")
+		//log.Panic(err)
+		return nil
 	}
-	var u model.RegisterUser
-	for rows.Next() {
-		//var u model.RegisterUser
-		err := rows.Scan(&u.ID, &u.Username, &u.Password, &u.Age)
-		if err != nil {
-			fmt.Println(err)
-
-		}
-	}
-	return err, u
-	//return err, reg
+	return &u
 }
 
 // 获取所有用户数据
 func GetAllUsers() []model.User {
-	rows, err := global.Mysql.Query("select * from tb_user")
+	rows, err := global.Mysql.Query("select * from sys_user")
 	if err != nil {
 		return nil
 	}
 	var persons = make([]model.User, 0)
 	for rows.Next() {
 		var a model.User
-		err := rows.Scan(&a.ID, &a.Name, &a.Password)
-		log.Println(&a.ID, "&a.ID")
-		log.Println(&a.ID, "&a.Username")
-		log.Println(&a.ID, "&a.Password")
-		//if err != nil {
-		//	return nil
-		//}
-		log.Println(err, "err")
-		log.Println(persons, "persons")
+		err := rows.Scan(&a.ID, &a.Username, &a.Password, &a.Age)
+		if err != nil {
+			return nil
+		}
 		persons = append(persons, a)
-
 	}
 	return persons
 }

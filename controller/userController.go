@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"ginessnital/dao"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -14,7 +13,7 @@ func CheckUsers(c *gin.Context) {
 	if users == nil {
 		c.JSON(200, gin.H{"error": 1, "msg": "查询失败"})
 	} else {
-		c.JSON(200, gin.H{"error": 0, "msg": "查询成功", "users": users})
+		c.JSON(200, gin.H{"error": 0, "msg": "查询成功", "data": users})
 	}
 
 }
@@ -38,13 +37,15 @@ func RegisterUserInfo(c *gin.Context) {
 func LoginUserInfo(c *gin.Context) {
 	username := c.PostForm("username")
 	password := c.PostForm("password")
-	_, result := dao.LoginUser(username, password)
-	fmt.Println(result)
-	//if err == sql.ErrNoRows {
-	//	c.JSON(200, gin.H{"code": 4001, "msg": "用户名不存在"})
-	//} else if err != nil {
-	//	c.JSON(200, gin.H{"code": 4002, "msg": "用户名或密码错误"})
-	//} else {
-	//	c.JSON(200, gin.H{"code": 2000, "msg": "登录成功"})
-	//}
+	result := dao.LoginUser(username)
+	if result != nil {
+		if result.Username != username || result.Password != password {
+			c.JSON(200, gin.H{"code": 4001, "data": result, "msg": "账号或密码错误"})
+		} else {
+			c.JSON(200, gin.H{"code": 2000, "data": result, "msg": "登录成功"})
+		}
+	} else {
+		c.JSON(200, gin.H{"code": 4001, "data": result, "msg": "用户名不存在"})
+	}
+
 }

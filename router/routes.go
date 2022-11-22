@@ -6,7 +6,7 @@ import (
 )
 
 func CollectRoutes(r *gin.Engine) *gin.Engine {
-	r.GET("/user/v1/check", controller.CheckUsers)
+	r.GET("/user/list", controller.CheckUsers)
 	r.POST("/user/register", controller.RegisterUserInfo)
 	r.POST("/user/login", controller.LoginUserInfo)
 	return r
