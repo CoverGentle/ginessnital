@@ -11,5 +11,6 @@ func main() {
 	r := gin.Default()
 	global.Mysql = db.InitDB()
 	r = router.CollectRoutes(r)
+
 	r.Run(":8080")
 }

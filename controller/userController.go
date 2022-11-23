@@ -2,10 +2,10 @@ package controller
 
 import (
 	"ginessnital/dao"
+	"ginessnital/middleware"
+	"ginessnital/model"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	"strconv"
 )
 
 func CheckUsers(c *gin.Context) {
@@ -20,29 +20,29 @@ func CheckUsers(c *gin.Context) {
 
 // 注册用户
 func RegisterUserInfo(c *gin.Context) {
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	age := c.PostForm("age")
-	log.Println(username, "username", password, "password", age, "age")
-	ageC, _ := strconv.Atoi(age)
-	err := dao.RegisterUser(username, password, ageC)
+	reg := model.User{}
+	c.Bind(&reg)
+	err := dao.RegisterUser(reg.Username, reg.Password, reg.Age)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "msg": "该用户名已被注册"})
 	} else {
-		c.JSON(200, gin.H{"code": 2000, "msg": "注册成功"})
+		c.JSON(http.StatusOK, gin.H{"code": 2000, "msg": "注册成功"})
 	}
 }
 
 // 用户登录
 func LoginUserInfo(c *gin.Context) {
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-	result := dao.LoginUser(username)
+	//username := c.PostForm("username")
+	//password := c.PostForm("password")
+	log := model.User{}
+	c.Bind(&log)
+	result := dao.LoginUser(log.Username)
 	if result != nil {
-		if result.Username != username || result.Password != password {
+		if result.Username != log.Username || result.Password != log.Password {
 			c.JSON(200, gin.H{"code": 4001, "data": result, "msg": "账号或密码错误"})
 		} else {
-			c.JSON(200, gin.H{"code": 2000, "data": result, "msg": "登录成功"})
+			tokenstring, _ := middleware.GetToken(log.Username)
+			c.JSON(200, gin.H{"code": 2000, "token": "banner_" + tokenstring, "msg": "登录成功"})
 		}
 	} else {
 		c.JSON(200, gin.H{"code": 4001, "data": result, "msg": "用户名不存在"})
