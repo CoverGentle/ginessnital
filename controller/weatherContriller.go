@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"ginessnital/dao"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,8 +11,8 @@ import (
  */
 
 func GetWeatherInfo(c *gin.Context) {
-	res, err := dao.GetWeather()
+	//res, err := dao.GetWeather()
 
-	c.JSON(200, gin.H{"data": res, "error": err})
+	//c.JSON(200, gin.H{"data": res, "error": err})
 
 }
